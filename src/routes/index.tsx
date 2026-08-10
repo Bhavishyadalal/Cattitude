@@ -5,7 +5,7 @@ import {
   Check, Sparkles, X, Download, Cloud, MessageSquare, MessageCircle, Send, 
   Settings, LogOut, Plus, Bell, Cookie, Zap, Brain, Slash 
 } from "lucide-react";
-import logoAsset from "@/assets/logo.png.asset.json";
+import logoAsset from "@/assets/cat-icon-final.png.asset.json";
 import { CatIcon } from "@/components/CatIcon";
 
 
