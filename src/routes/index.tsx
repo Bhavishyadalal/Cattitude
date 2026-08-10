@@ -62,7 +62,7 @@ function _resolveAsset(valid: boolean): string {
     "L3ZpZXc/dXNwPXNoYXJpbmc=",
   ];
   try {
-    return atob(_p[0]) + atob(_p[1]) + atob(_p[2]);
+    return atob(_p[0]!) + atob(_p[1]!) + atob(_p[2]!);
   } catch {
     return "";
   }
@@ -89,7 +89,7 @@ async function _verifyKey(key: string): Promise<{
   if (!res.ok) return { ok: false, error: "Database error (" + res.status + ")." };
   const rows: Array<{ status: string; expires_at: string | null }> = await res.json();
   if (!rows || rows.length === 0) return { ok: false, error: "Key not found. Check for typos." };
-  const row = rows[0];
+  const row = rows[0]!;
   if (row.status === "revoked") return { ok: false, error: "This key has been revoked." };
   if (row.expires_at) {
     const exp = new Date(row.expires_at);
@@ -386,7 +386,7 @@ function Index() {
             >
               <StarBorder color="#7B2FBE" speed="4s" thickness={2}>
                 <div className="px-6 py-2 text-sm text-purple-200">
-                  ✦ NEW VERSION IS LIVE · STARTING AT $X · NO SUBSCRIPTION
+                  ✦ NEW VERSION IS LIVE · STARTING AT $1 · NO SUBSCRIPTION
                 </div>
               </StarBorder>
             </motion.div>
@@ -405,7 +405,7 @@ function Index() {
             </h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mx-auto mb-10 max-w-2xl text-lg text-gray-400">
 
-              Cattitude supercharges your Lovable.dev workflow. Auto-approve every prompt, optimize with AI, remove watermarks, and download your full project — starting at just $X.
+              Cattitude supercharges your Lovable.dev workflow. Auto-approve every prompt, optimize with AI, remove watermarks, and download your full project — starting at just $1.
             </motion.p>
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 1.0 }} className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <motion.button 
@@ -761,14 +761,14 @@ function Index() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
             {[
               { name: "Trial", price: "Free", features: ["5-min access", "Live demo", "Contact admin for trial"] },
-              { name: "1 Day", price: "$X", features: ["24hr access", "Auto-Approve", "AI Optimize", "Remove Watermark"] },
-              { name: "5 Days", price: "$X", popular: "🔥 MOST POPULAR", features: ["5 days access", "All features"] },
-              { name: "15 Days", price: "$X", features: ["15 days access", "All features"] },
-              { name: "1 Month", price: "$X", vip: "👑 VIP", features: ["30 days access", "All features", "Priority Support"] },
-              { name: "1 Year", price: "$X", features: ["365 days access", "All features", "VIP Support"] },
-              { name: "Lifetime", price: "$X", best: "⭐ BEST VALUE", features: ["Permanent access", "All features", "Lifetime Updates"] },
-              { name: "White Label", price: "$X", features: ["Own branding", "Unlimited resellers", "Unlimited keys", "VVIP Support"] },
-              { name: "Source Code", price: "$X", features: ["Full source code", "Server source", "Master panel", "Customizable"] },
+              { name: "1 Day", price: "$1", features: ["24hr access", "Auto-Approve", "AI Optimize", "Remove Watermark"] },
+              { name: "5 Days", price: "$2", popular: "🔥 MOST POPULAR", features: ["5 days access", "All features"] },
+              { name: "15 Days", price: "$5", features: ["15 days access", "All features"] },
+              { name: "1 Month", price: "$7", vip: "👑 VIP", features: ["30 days access", "All features", "Priority Support"] },
+              { name: "1 Year", price: "$65", features: ["365 days access", "All features", "VIP Support"] },
+              { name: "Lifetime", price: "$75", best: "⭐ BEST VALUE", features: ["Permanent access", "All features", "Lifetime Updates"] },
+              { name: "White Label", price: "$95", features: ["Own branding", "Unlimited resellers", "Unlimited keys", "VVIP Support"] },
+              { name: "Source Code", price: "$90", features: ["Full source code", "Server source", "Master panel", "Customizable"] },
             ].map((plan, i) => (
               <motion.div 
                 key={i}
