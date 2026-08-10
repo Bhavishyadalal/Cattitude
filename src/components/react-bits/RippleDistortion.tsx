@@ -205,12 +205,22 @@ const RippleDistortion = ({
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const renderer = new Renderer({
-      alpha: false,
-      antialias: false,
-      dpr: Math.min(window.devicePixelRatio || 1, 2)
-    });
-    const gl = renderer.gl;
+    let renderer;
+    let gl;
+
+    try {
+      renderer = new Renderer({
+        alpha: false,
+        antialias: false,
+        dpr: Math.min(window.devicePixelRatio || 1, 2)
+      });
+      gl = renderer.gl;
+    } catch (e) {
+      console.error("RippleDistortion WebGL init failed", e);
+      mount.style.display = 'none';
+      return;
+    }
+
     gl.clearColor(0, 0, 0, 1);
     const canvas = gl.canvas;
     canvas.style.width = '100%';

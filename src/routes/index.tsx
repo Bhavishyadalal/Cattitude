@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, AnimatePresence, useScroll, useSpring, useMotionValue, useTransform, useInView, useReducedMotion, LazyMotion, domAnimation } from "framer-motion";
+import { motion, useScroll, useSpring, useMotionValue, useTransform, useInView, LazyMotion, domAnimation } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { 
   Check, Sparkles, X, Download, Cloud, MessageSquare, MessageCircle, Send, 
@@ -64,9 +64,8 @@ function Index() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <AnimatePresence>
 
-      <motion.div className="min-h-screen bg-[#0D0B1A] text-white overflow-x-hidden relative">
+      <motion.div className="min-h-screen bg-[#0D0B1A] text-white overflow-x-hidden relative selection:bg-[#7B2FBE]/30 selection:text-[#00FF88]">
         {/* Ripple Distortion Overlay */}
         <div className="fixed inset-0 pointer-events-none z-[1] opacity-40">
           <RippleDistortion 
@@ -127,7 +126,7 @@ function Index() {
                 >
                   🐱
                 </motion.span> 
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:to-[#00FF88] transition-all duration-300">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-400 to-[#00FF88] group-hover:from-[#00FF88] group-hover:to-white transition-all duration-500">
                   Cattitude
                 </span>
               </div>
@@ -161,20 +160,23 @@ function Index() {
               ))}
             </div>
 
-            <motion.button 
-              animate={{ boxShadow: ["0 0 0px rgba(0,255,136,0)", "0 0 15px rgba(0,255,136,0.4)", "0 0 0px rgba(0,255,136,0)"] }}
-              transition={{ repeat: Infinity, duration: 2 }}
+            <SpecularButton 
               onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })}
-              className="rounded-full bg-[#00FF88] px-4 py-1.5 text-sm font-semibold text-[#0D0B1A] hover:bg-[#00cc6c]"
+              size="sm"
+              lineColor="#00FF88"
+              baseColor="#064e3b"
+              radius={24}
+              proximity={200}
+              autoAnimate
             >
               Get License
-            </motion.button>
+            </SpecularButton>
           </div>
         </motion.nav>
 
 
         {/* Hero */}
-        <section className="relative container mx-auto px-4 pt-20 pb-20 text-center overflow-hidden">
+        <section className="relative z-0 isolation-auto container mx-auto px-4 pt-20 pb-20 text-center">
           <motion.div 
             animate={{ x: [0, 30, -20, 0], y: [0, -20, 10, 0] }}
             transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
@@ -199,22 +201,22 @@ function Index() {
               </StarBorder>
             </motion.div>
             <h1 className="mb-6 text-5xl font-black leading-tight md:text-[80px]">
-              <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+              <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} style={{ minHeight: '7rem' }}>
                 <WarpText 
-                  text="Build in Lovable."
+                  text="Cattitude."
                   fontSize="clamp(3rem, 10vw, 6rem)"
                   color="#ffffff"
                   warpStrength={0.1}
                   pointerStrength={0.4}
                   className="mb-0"
-                  style={{ minHeight: 'auto', height: '1.2em' }}
+                  style={{ minHeight: '1.2em', height: 'auto' }}
                 />
               </motion.div>
               <motion.div 
                 initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
                 className="relative inline-block overflow-hidden"
               >
-                <span className="bg-gradient-to-r from-[#FF3CAC] via-[#7B2FBE] to-[#00FF88] bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient-flow">
+                <span className="bg-gradient-to-r from-[#FF3CAC] via-[#7B2FBE] to-[#00FF88] bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient-flow drop-shadow-[0_0_15px_rgba(123,47,190,0.3)]">
                   10x Faster.
                 </span>
               </motion.div>
@@ -231,8 +233,8 @@ function Index() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })}
-                className="rounded-full border-2 border-[#00FF88] px-8 py-3 font-semibold text-[#00FF88] shadow-[0_0_15px_rgba(0,255,136,0.3)] hover:bg-[#00FF88] hover:text-[#0D0B1A] transition-all"
-                style={{ boxShadow: "0 0 10px rgba(0, 255, 136, 0.3)" }}
+                className="rounded-full border-2 border-[#00FF88] px-8 py-3 font-semibold text-[#00FF88] hover:bg-[#00FF88] hover:text-[#0D0B1A] transition-all"
+                
                 animate={{ boxShadow: ["0 0 10px rgba(0, 255, 136, 0.3)", "0 0 25px rgba(0, 255, 136, 0.5)", "0 0 10px rgba(0, 255, 136, 0.3)"] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
@@ -242,8 +244,8 @@ function Index() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => window.open('https://t.me/your_telegram', '_blank', 'noopener,noreferrer')}
-                className="rounded-full border-2 border-[#7B2FBE] px-8 py-3 font-semibold text-[#7B2FBE] shadow-[0_0_15px_rgba(123,47,190,0.3)] hover:bg-[#7B2FBE] hover:text-white transition-all"
-                style={{ boxShadow: "0 0 10px rgba(123, 47, 190, 0.3)" }}
+                className="rounded-full border-2 border-[#7B2FBE] px-8 py-3 font-semibold text-[#7B2FBE] hover:bg-[#7B2FBE] hover:text-white transition-all"
+                
                 animate={{ boxShadow: ["0 0 10px rgba(123, 47, 190, 0.3)", "0 0 25px rgba(123, 47, 190, 0.5)", "0 0 10px rgba(123, 47, 190, 0.3)"] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
@@ -277,13 +279,15 @@ function Index() {
 
         {/* UI Mockup Section */}
         <section className="container mx-auto px-4 py-20 perspective-1000">
-          <GlareHover
-            glareColor="#00FF88"
-            glareOpacity={0.2}
-            className="mx-auto max-w-sm relative"
-            style={{ border: 'none', background: 'transparent' }}
-          >
+          <div className="relative mx-auto max-w-sm">
             <FluidGlass mode="lens" style={{ position: 'absolute', top: -100, right: -100, width: '300px', height: '300px', pointerEvents: 'none', zIndex: 30 }} />
+            <GlareHover
+              glareColor="#00FF88"
+              glareOpacity={0.2}
+              className="relative"
+              style={{ border: 'none', background: 'transparent' }}
+            >
+
 
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
@@ -344,7 +348,8 @@ function Index() {
               ))}
               </div>
             </motion.div>
-          </GlareHover>
+            </GlareHover>
+          </div>
         </section>
 
         {/* Divider */}
@@ -408,7 +413,7 @@ function Index() {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 items-stretch">
             {[
               { name: "1 Day", price: "$X", features: ["24hr access", "Auto-Approve", "AI Optimize", "Remove Watermark"] },
               { name: "5 Days", price: "$X", features: ["5 days access", "All features"] },
@@ -548,7 +553,7 @@ function Index() {
           </motion.button>
         </div>
       </motion.div>
-    </AnimatePresence>
+    
   </LazyMotion>
   );
 }
@@ -569,7 +574,7 @@ function FeatureCard({ feat, i }: { feat: any, i: number }) {
         whileInView={{ rotate: 360 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="mb-4 inline-flex p-3 rounded-full bg-white/5 text-[#00FF88] group-hover:scale-115 group-hover:bg-[#00FF88]/10 transition-all shadow-[0_0_15px_transparent] group-hover:shadow-[#00FF88]/20"
+        className="mb-4 inline-flex p-3 rounded-full bg-white/5 text-[#00FF88] group-hover:scale-110 group-hover:bg-[#00FF88]/10 transition-all shadow-[0_0_15px_transparent] group-hover:shadow-[#00FF88]/20"
       >
         {feat.icon}
       </motion.div>
@@ -587,7 +592,7 @@ function PricingCard({ plan, i }: { plan: any, i: number }) {
       viewport={{ once: true }}
       transition={{ delay: i * 0.08 }}
       whileHover={{ scale: 1.03, borderColor: "rgba(255, 255, 255, 0.3)" }}
-      className="relative rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all h-full flex flex-col"
+      className="relative rounded-2xl border border-white/10 bg-white/5 p-6 pt-10 backdrop-blur-sm transition-all h-full flex flex-col"
     >
       {plan.popular && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FF3CAC] text-[10px] font-bold px-3 py-1 rounded-full overflow-hidden">

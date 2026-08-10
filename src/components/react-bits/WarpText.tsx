@@ -322,14 +322,17 @@ const WarpText = ({
     }
 
     gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     const canvas = gl.canvas;
     canvas.style.position = 'absolute';
     canvas.style.inset = '0';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
     canvas.style.display = 'block';
+    canvas.style.background = 'transparent';
     canvas.setAttribute('aria-hidden', 'true');
     container.appendChild(canvas);
+    container.style.background = 'transparent';
 
     texture = new Texture(gl, {
       generateMipmaps: false,

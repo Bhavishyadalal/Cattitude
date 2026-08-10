@@ -62,6 +62,10 @@
 }
 
 :root {
+  background-color: #0D0B1A !important;
+
+
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -138,7 +142,7 @@
   }
 
   body {
-    background-color: var(--color-background);
+    background-color: #0D0B1A !important;
     color: var(--color-foreground);
   }
 
