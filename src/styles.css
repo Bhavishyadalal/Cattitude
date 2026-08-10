@@ -62,10 +62,6 @@
 }
 
 :root {
-  background-color: #0D0B1A !important;
-
-
-
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -142,18 +138,7 @@
   }
 
   body {
-    background-color: #0D0B1A !important;
+    background-color: var(--color-background);
     color: var(--color-foreground);
-  }
-
-  @keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  .animate-gradient-flow {
-    background-size: 200% auto;
-    animation: gradient-flow 6s linear infinite;
   }
 }
