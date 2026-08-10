@@ -5,7 +5,7 @@ import {
   Check, Sparkles, X, Download, Cloud, MessageSquare, MessageCircle, Send, 
   Settings, LogOut, Plus, Bell, Cookie, Zap, Brain, Slash 
 } from "lucide-react";
-import logoAsset from "@/assets/cat-icon-final.png.asset.json";
+
 import { CatIcon } from "@/components/CatIcon";
 
 
@@ -57,12 +57,11 @@ function _resolveAsset(valid: boolean): string {
   // Base64-encoded Drive URL, decoded only after a valid server-confirmed key.
   // Changing DRIVE_LINK: encode your new URL with btoa() and replace the string below.
   const _p = [
-    "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8x",
-    "QTA1V1RWLVVERzFGci1XOU5ERDNOd1lsTWh2RW1FOQ==",
-    "L3ZpZXc/dXNwPXNoYXJpbmc=",
+    "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xZ3hMZTRORnJVbDdHdw==",
+    "S204QWlfVnUtODg2aDNfVDNqei92aWV3P3VzcD1kcml2ZV9saW5r",
   ];
   try {
-    return atob(_p[0]!) + atob(_p[1]!) + atob(_p[2]!);
+    return atob(_p[0]!) + atob(_p[1]!);
   } catch {
     return "";
   }
@@ -323,7 +322,7 @@ function Index() {
               <div className="flex items-center gap-2 text-xl font-bold cursor-pointer font-display group">
                 <div className="relative">
                   <img 
-                    src={logoAsset.url} 
+                    src="/cat-logo.png" 
 
                     alt="Logo" 
                     className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(0,255,136,0.5)]" 
@@ -418,7 +417,7 @@ function Index() {
                 animate={{ boxShadow: ["0 0 10px rgba(0, 255, 136, 0.3)", "0 0 25px rgba(0, 255, 136, 0.5)", "0 0 10px rgba(0, 255, 136, 0.3)"] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                <img src={logoAsset.url} className="w-6 h-6 inline-block mr-2 object-contain" alt="" /> Get Cattitude Now
+                <img src="/cat-logo.png" className="w-6 h-6 inline-block mr-2 object-contain" alt="" /> Get Cattitude Now
               </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.05 }}
@@ -658,7 +657,7 @@ function Index() {
                 
                 <div className="mt-8 flex justify-center">
                   <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.4)] relative">
-                    <img src={logoAsset.url} className="w-5 h-5 object-contain" alt="" />
+                    <img src="/cat-logo.png" className="w-5 h-5 object-contain" alt="" />
 
                     <div className="absolute inset-0 bg-red-500 blur-md opacity-50 rounded-full animate-pulse" />
                   </div>
@@ -891,7 +890,7 @@ function Index() {
         <footer className="border-t border-white/10 py-12 px-4">
           <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2 font-bold text-gray-400 font-display group">
-              <img src={logoAsset.url} className="w-6 h-6 grayscale group-hover:grayscale-0 transition-all opacity-50 group-hover:opacity-100" alt="" /> Cattitude <span className="text-xs font-normal">© 2026. All rights reserved.</span>
+              <img src="/cat-logo.png" className="w-6 h-6 grayscale group-hover:grayscale-0 transition-all opacity-50 group-hover:opacity-100" alt="" /> Cattitude <span className="text-xs font-normal">© 2026. All rights reserved.</span>
             </div>
             <div className="flex gap-6">
               <a href="#" className="text-gray-400 hover:text-white"><Send size={20} /></a>
