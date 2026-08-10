@@ -5,7 +5,7 @@ import {
   Check, Sparkles, X, Download, Cloud, MessageSquare, MessageCircle, Send, 
   Settings, LogOut, Plus, Bell, Cookie, Zap, Brain, Slash 
 } from "lucide-react";
-import logoAsset from "@/assets/cat-icon-new.png.asset.json";
+import logoAsset from "@/assets/logo.png.asset.json";
 import { CatIcon } from "@/components/CatIcon";
 
 
@@ -324,6 +324,7 @@ function Index() {
                 <div className="relative">
                   <img 
                     src={logoAsset.url} 
+
                     alt="Logo" 
                     className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(0,255,136,0.5)]" 
                   />
@@ -658,6 +659,7 @@ function Index() {
                 <div className="mt-8 flex justify-center">
                   <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.4)] relative">
                     <img src={logoAsset.url} className="w-5 h-5 object-contain" alt="" />
+
                     <div className="absolute inset-0 bg-red-500 blur-md opacity-50 rounded-full animate-pulse" />
                   </div>
                 </div>
