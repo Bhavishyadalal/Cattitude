@@ -129,24 +129,15 @@ const MoltenMetal = ({
     const container = containerRef.current;
     if (!container) return;
 
-    let renderer;
-    let gl;
+    const renderer = new Renderer({
+      webgl: 2,
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      dpr: Math.min(window.devicePixelRatio || 1, 2)
+    });
 
-    try {
-      renderer = new Renderer({
-        webgl: 2,
-        alpha: true,
-        premultipliedAlpha: true,
-        antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 2)
-      });
-      gl = renderer.gl;
-    } catch (e) {
-      console.error("MoltenMetal WebGL init failed", e);
-      container.style.display = 'none';
-      return;
-    }
-
+    const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 0);
     const canvas = gl.canvas;
     canvas.style.width = '100%';
