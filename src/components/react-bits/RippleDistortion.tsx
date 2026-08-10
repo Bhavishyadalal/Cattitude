@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Geometry, Triangle, Texture, RenderTarget } from 'ogl';
 import './RippleDistortion.css';
 
 const MAX_WAVES = 100;
-const QUALITY_SCALE: any = { low: 0.4, medium: 0.7, high: 1 };
+const QUALITY_SCALE: Record<string, number> = { low: 0.4, medium: 0.7, high: 1 };
 const START_SCALE = 1.5;
 const LIFE_CONSTANT = Math.log(500);
 
@@ -131,7 +130,7 @@ void main() {
 }
 `;
 
-const hexToRGB = (hex: string) => {
+const hexToRGB = (hex: string): [number, number, number] => {
   const clean = hex.replace('#', '');
   const full =
     clean.length === 3
@@ -145,27 +144,13 @@ const hexToRGB = (hex: string) => {
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 };
 
-interface RippleDistortionProps {
-  src?: string;
-  brushSize?: number;
-  strength?: number;
-  swirl?: number;
-  rings?: number;
-  spread?: number;
-  fade?: number;
-  spacing?: number;
-  dispersion?: number;
-  glint?: number;
-  tint?: string;
-  tintAmount?: number;
-  grayscale?: boolean;
-  highlightColor?: string;
-  trigger?: 'hover' | 'click' | 'both';
-  clickStrength?: number;
-  quality?: 'low' | 'medium' | 'high';
-  enabled?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
+interface Wave {
+  x: number;
+  y: number;
+  scale: number;
+  target: number;
+  size: number;
+  opacity: number;
 }
 
 const RippleDistortion = ({
@@ -189,69 +174,37 @@ const RippleDistortion = ({
   enabled = true,
   className = '',
   style
-}: RippleDistortionProps) => {
-  const mountRef = useRef<any>(null);
-  const configRef = useRef<any>({});
+}: any) => {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const configRef = useRef({ brushSize, spread, fade, spacing, clickStrength, trigger, enabled });
   const uniformsRef = useRef<any>(null);
 
   configRef.current = { brushSize, spread, fade, spacing, clickStrength, trigger, enabled };
 
   useEffect(() => {
+
+
     const mount = mountRef.current;
     if (!mount) return;
+
+    let disposed = false;
+    let renderer: any = null;
+    let gl: any = null;
+    let canvas: any = null;
+    let raf: number = 0;
+    let ro: ResizeObserver | null = null;
+    let previousTime = 0;
 
     const reduceMotion =
       typeof window !== 'undefined' &&
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    let renderer;
-    let gl;
-
-    try {
-      renderer = new Renderer({
-        alpha: false,
-        antialias: false,
-        dpr: Math.min(window.devicePixelRatio || 1, 2)
-      });
-      gl = renderer.gl;
-    } catch (e) {
-      console.error("RippleDistortion WebGL init failed", e);
-      mount.style.display = 'none';
-      return;
-    }
-
-    gl.clearColor(0, 0, 0, 1);
-    const canvas = gl.canvas;
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.display = 'block';
-    mount.appendChild(canvas);
-
-    const imageTexture = new Texture(gl, {
-      generateMipmaps: false,
-      minFilter: gl.LINEAR,
-      magFilter: gl.LINEAR,
-      wrapS: gl.CLAMP_TO_EDGE,
-      wrapT: gl.CLAMP_TO_EDGE
-    });
-
-    let disposed = false;
-    const image = new window.Image();
-    image.crossOrigin = 'anonymous';
-    image.decoding = 'async';
-    image.onload = () => {
-      if (disposed) return;
-      imageTexture.image = image;
-      compositeUniforms.uTextureSize.value = [image.naturalWidth || 1, image.naturalHeight || 1];
-    };
-    image.src = src;
-
     const offsets = new Float32Array(MAX_WAVES * 2);
     const scales = new Float32Array(MAX_WAVES * 2);
     const opacities = new Float32Array(MAX_WAVES);
 
-    const waves: any[] = Array.from({ length: MAX_WAVES }, () => ({
+    const waves: Wave[] = Array.from({ length: MAX_WAVES }, () => ({
       x: 0,
       y: 0,
       scale: START_SCALE,
@@ -261,105 +214,29 @@ const RippleDistortion = ({
     }));
     let current = 0;
 
-    const geometry = new Geometry(gl, {
-      position: { size: 2, data: new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]) },
-      uv: { size: 2, data: new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]) },
-      iOffset: { instanced: 1, size: 2, data: offsets },
-      iScale: { instanced: 1, size: 2, data: scales },
-      iOpacity: { instanced: 1, size: 1, data: opacities }
-    });
+    let waveMesh: Mesh;
+    let compositeMesh: Mesh;
+    let geometry: Geometry;
+    let displacementTarget: RenderTarget;
 
-    const waveUniforms = { uRings: { value: rings } };
-    const waveProgram = new Program(gl, {
-      vertex: waveVertex,
-      fragment: waveFragment,
-      uniforms: waveUniforms,
-      transparent: true,
-      depthTest: false,
-      depthWrite: false,
-      cullFace: false
-    });
-    waveProgram.setBlendFunc(gl.ONE, gl.ONE);
-    const waveMesh = new Mesh(gl, { geometry, program: waveProgram, frustumCulled: false });
-
-    const displacementTarget = new RenderTarget(gl, {
-      width: 2,
-      height: 2,
-      depth: false,
-      minFilter: gl.LINEAR,
-      magFilter: gl.LINEAR,
-      wrapS: gl.CLAMP_TO_EDGE,
-      wrapT: gl.CLAMP_TO_EDGE
-    });
-
-    const compositeUniforms = {
-      uTexture: { value: imageTexture },
-      uDisplacement: { value: displacementTarget.texture },
-      uResolution: { value: [1, 1] },
-      uTextureSize: { value: [1, 1] },
-      uTexel: { value: [1, 1] },
-      uTint: { value: hexToRGB(tint) },
-      uHighlight: { value: hexToRGB(highlightColor) },
-      uStrength: { value: strength },
-      uSwirl: { value: swirl },
-      uDispersion: { value: dispersion },
-      uGlint: { value: glint },
-      uTintAmount: { value: tintAmount },
-      uGrayscale: { value: grayscale ? 1 : 0 }
-    };
-
-    const compositeMesh = new Mesh(gl, {
-      geometry: new Triangle(gl),
-      program: new Program(gl, {
-        vertex: screenVertex,
-        fragment: compositeFragment,
-        uniforms: compositeUniforms,
-        depthTest: false,
-        depthWrite: false
-      })
-    });
-
-    uniformsRef.current = { wave: waveUniforms, composite: compositeUniforms };
-
-    let width: any = 1;
-    let height: any = 1;
-
-    const resize = () => {
-      const targetMount: any = mountRef.current;
-      if (!targetMount) return;
-      width = Math.max(1, targetMount.clientWidth);
-      height = Math.max(1, targetMount.clientHeight);
-      renderer.setSize(width, height);
-      compositeUniforms.uResolution.value = [width, height];
-
-      const scale: any = QUALITY_SCALE[quality as string] || QUALITY_SCALE.high || 1;
-      const fieldW: any = Math.max(2, Math.round((width || 1) * scale));
-      const fieldH: any = Math.max(2, Math.round((height || 1) * scale));
-      displacementTarget.setSize(fieldW, fieldH);
-      compositeUniforms.uTexel.value = [1 / fieldW, 1 / fieldH];
-    };
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(mount);
-    resize();
+    let width = 1;
+    let height = 1;
 
     const setNewWave = (x: number, y: number, power: number) => {
       const cfg = configRef.current;
-      const wave = waves[current];
-      if (!wave) return;
+      const wave = waves[current]!;
       current = (current + 1) % MAX_WAVES;
       wave.x = x;
       wave.y = y;
       wave.scale = START_SCALE * power;
-      wave.target = START_SCALE * Math.max(1, (cfg.spread as any) || 5) * power;
-      wave.size = Math.max(1, (cfg.brushSize as any) || 150);
+      wave.target = START_SCALE * Math.max(1, cfg.spread) * power;
+      wave.size = Math.max(1, cfg.brushSize);
       wave.opacity = 1;
     };
 
-    const localPoint = (clientX: number, clientY: number) => {
-      const targetMount: any = mountRef.current;
-      if (!targetMount) return null;
-      const rect = targetMount.getBoundingClientRect();
+    const localPoint = (clientX: number, clientY: number): [number, number] | null => {
+      if (!mount) return null;
+      const rect = mount.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return null;
       if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
         return null;
@@ -370,12 +247,14 @@ const RippleDistortion = ({
     let previousX = 0;
     let previousY = 0;
 
-    const onMove = (event: PointerEvent) => {
+    const onPointerMove = (event: PointerEvent) => {
       const cfg = configRef.current;
       if (!cfg.enabled || reduceMotion || cfg.trigger === 'click') return;
+      
       const point = localPoint(event.clientX, event.clientY);
       if (!point) return;
-      const step = Math.max(1, (cfg.spacing as any) || 15);
+
+      const step = Math.max(1, cfg.spacing);
       if (Math.abs(point[0] - previousX) > step || Math.abs(point[1] - previousY) > step) {
         setNewWave(point[0], point[1], 1);
         previousX = point[0];
@@ -383,32 +262,29 @@ const RippleDistortion = ({
       }
     };
 
-    const onDown = (event: PointerEvent) => {
+    const onPointerDown = (event: PointerEvent) => {
       const cfg = configRef.current;
       if (!cfg.enabled || reduceMotion || cfg.trigger === 'hover') return;
+      
       const point = localPoint(event.clientX, event.clientY);
       if (!point) return;
-      setNewWave(point[0], point[1], Math.max(1, (cfg.clickStrength as any) || 2));
+      
+      setNewWave(point[0], point[1], Math.max(1, cfg.clickStrength));
     };
 
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerdown', onDown, { passive: true });
-
-    let raf = 0;
-    let previousTime = 0;
-
     const loop = (now: number) => {
+      if (disposed) return;
       raf = requestAnimationFrame(loop);
       const delta = previousTime ? Math.min(0.05, (now - previousTime) / 1000) : 0;
       previousTime = now;
       const cfg = configRef.current;
 
       const growth = reduceMotion ? 0 : 1 - Math.exp(-delta * 1.09);
-      const decay = reduceMotion ? 1 : Math.exp((-delta * LIFE_CONSTANT) / Math.max(0.15, (cfg.fade as any) || 3));
+      const decay = reduceMotion ? 1 : Math.exp((-delta * LIFE_CONSTANT) / Math.max(0.15, cfg.fade));
 
       for (let i = 0; i < MAX_WAVES; i += 1) {
-        const wave = waves[i];
-        if (!wave || wave.opacity <= 0) {
+        const wave = waves[i]!;
+        if (wave.opacity <= 0) {
           opacities[i] = 0;
           continue;
         }
@@ -422,34 +298,160 @@ const RippleDistortion = ({
           continue;
         }
 
-        const half = (wave.scale * (wave.size || 1)) / 2;
-        offsets[i * 2] = (wave.x / (width || 1)) * 2 - 1;
-        offsets[i * 2 + 1] = (wave.y / (height || 1)) * 2 - 1;
-        scales[i * 2] = (half / (width || 1)) * 2;
-        scales[i * 2 + 1] = (half / (height || 1)) * 2;
+        const half = (wave.scale * wave.size) / 2;
+        offsets[i * 2] = (wave.x / width) * 2 - 1;
+        offsets[i * 2 + 1] = (wave.y / height) * 2 - 1;
+        scales[i * 2] = (half / width) * 2;
+        scales[i * 2 + 1] = (half / height) * 2;
         opacities[i] = wave.opacity;
       }
 
-      const attrs: any = geometry.attributes;
-      if (attrs.iOffset) attrs.iOffset.needsUpdate = true;
-      if (attrs.iScale) attrs.iScale.needsUpdate = true;
-      if (attrs.iOpacity) attrs.iOpacity.needsUpdate = true;
+      const attributes = geometry.attributes as any;
+      attributes.iOffset.needsUpdate = true;
+      attributes.iScale.needsUpdate = true;
+      attributes.iOpacity.needsUpdate = true;
 
       renderer.render({ scene: waveMesh, target: displacementTarget, clear: true });
       renderer.render({ scene: compositeMesh });
     };
-    raf = requestAnimationFrame(loop);
+
+    const init = () => {
+      if (disposed || !mount) return;
+      
+      renderer = new Renderer({
+        alpha: false,
+        antialias: false,
+        dpr: Math.min(window.devicePixelRatio || 1, 2)
+      });
+      gl = renderer.gl;
+      gl.clearColor(0, 0, 0, 1);
+      canvas = gl.canvas as HTMLCanvasElement;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.display = 'block';
+      mount.appendChild(canvas);
+
+
+      const imageTexture = new Texture(gl, {
+        generateMipmaps: false,
+        minFilter: gl.LINEAR,
+        magFilter: gl.LINEAR,
+        wrapS: gl.CLAMP_TO_EDGE,
+        wrapT: gl.CLAMP_TO_EDGE
+      });
+
+      const image = new window.Image();
+      image.crossOrigin = 'anonymous';
+      image.decoding = 'async';
+      image.onload = () => {
+        if (disposed) return;
+        imageTexture.image = image;
+        if (uniformsRef.current) {
+          uniformsRef.current.composite.uTextureSize.value = [image.naturalWidth || 1, image.naturalHeight || 1];
+        }
+      };
+      image.src = src;
+
+      geometry = new Geometry(gl, {
+        position: { size: 2, data: new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]) },
+        uv: { size: 2, data: new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]) },
+        iOffset: { instanced: 1, size: 2, data: offsets },
+        iScale: { instanced: 1, size: 2, data: scales },
+        iOpacity: { instanced: 1, size: 1, data: opacities }
+      });
+
+      const waveUniforms = { uRings: { value: rings } };
+      const waveProgram = new Program(gl, {
+        vertex: waveVertex,
+        fragment: waveFragment,
+        uniforms: waveUniforms,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        cullFace: false
+      });
+      waveProgram.setBlendFunc(gl.ONE, gl.ONE);
+      waveMesh = new Mesh(gl, { geometry, program: waveProgram, frustumCulled: false });
+
+      displacementTarget = new RenderTarget(gl, {
+        width: 2,
+        height: 2,
+        depth: false,
+        minFilter: gl.LINEAR,
+        magFilter: gl.LINEAR,
+        wrapS: gl.CLAMP_TO_EDGE,
+        wrapT: gl.CLAMP_TO_EDGE
+      });
+
+      const compositeUniforms = {
+        uTexture: { value: imageTexture },
+        uDisplacement: { value: displacementTarget.texture },
+        uResolution: { value: [1, 1] },
+        uTextureSize: { value: [1, 1] },
+        uTexel: { value: [1, 1] },
+        uTint: { value: hexToRGB(tint) },
+        uHighlight: { value: hexToRGB(highlightColor) },
+        uStrength: { value: strength },
+        uSwirl: { value: swirl },
+        uDispersion: { value: dispersion },
+        uGlint: { value: glint },
+        uTintAmount: { value: tintAmount },
+        uGrayscale: { value: grayscale ? 1 : 0 }
+      };
+
+      compositeMesh = new Mesh(gl, {
+        geometry: new Triangle(gl),
+        program: new Program(gl, {
+          vertex: screenVertex,
+          fragment: compositeFragment,
+          uniforms: compositeUniforms,
+          depthTest: false,
+          depthWrite: false
+        })
+      });
+
+      uniformsRef.current = { wave: waveUniforms, composite: compositeUniforms };
+
+      const resize = () => {
+        if (!mount || !renderer) return;
+        width = Math.max(1, mount.clientWidth);
+        height = Math.max(1, mount.clientHeight);
+        renderer.setSize(width, height);
+        compositeUniforms.uResolution.value = [width, height];
+
+        const scale = QUALITY_SCALE[quality] ?? QUALITY_SCALE['high'];
+        const fieldW = Math.max(2, Math.round(width * scale!));
+        const fieldH = Math.max(2, Math.round(height * scale!));
+        displacementTarget.setSize(fieldW, fieldH);
+        compositeUniforms.uTexel.value = [1 / fieldW, 1 / fieldH];
+      };
+
+      ro = new ResizeObserver(resize);
+      ro.observe(mount);
+      resize();
+
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerdown', onPointerDown, { passive: true });
+
+      raf = requestAnimationFrame(loop);
+    };
+
+    // Use a small delay to ensure mount is stable in DOM
+    const timeout = setTimeout(init, 50);
 
     return () => {
       disposed = true;
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerdown', onDown);
+      clearTimeout(timeout);
+      if (raf) cancelAnimationFrame(raf);
+      if (ro) ro.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
       uniformsRef.current = null;
-      if (canvas.parentNode === mount) mount.removeChild(canvas);
-      const ext = gl.getExtension('WEBGL_lose_context');
-      if (ext) ext.loseContext();
+      if (canvas && canvas.parentNode === mount) mount.removeChild(canvas);
+      if (gl) {
+        const ext = gl.getExtension('WEBGL_lose_context');
+        if (ext) ext.loseContext();
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, quality]);
@@ -468,7 +470,7 @@ const RippleDistortion = ({
     u.composite.uTint.value = hexToRGB(tint);
   }, [rings, strength, swirl, dispersion, glint, tintAmount, grayscale, highlightColor, tint]);
 
-  return <div ref={mountRef} className={`ripple-distortion ${className}`.trim()} style={style} />;
+  return <div ref={mountRef} className={`ripple-distortion pointer-events-auto ${className}`.trim()} style={style} />;
 };
 
 export default RippleDistortion;
