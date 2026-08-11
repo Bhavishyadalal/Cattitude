@@ -5,7 +5,7 @@ import {
   Check, Sparkles, X, Download, Cloud, MessageSquare, MessageCircle, Send, 
   Settings, LogOut, Plus, Bell, Cookie, Zap, Brain, Slash 
 } from "lucide-react";
-
+import logoAsset from "@/assets/cat-icon-final.png.asset.json";
 import { CatIcon } from "@/components/CatIcon";
 
 
@@ -17,6 +17,12 @@ import GradualBlur from "@/components/react-bits/GradualBlur";
 import GlareHover from "@/components/react-bits/GlareHover";
 import MoltenMetal from "@/components/react-bits/MoltenMetal";
 import CustomCursor from "@/components/CustomCursor";
+import ScrollFloat from "@/components/react-bits/ScrollFloat";
+import GlitchText from "@/components/react-bits/GlitchText";
+import ElectricBorder from "@/components/react-bits/ElectricBorder";
+
+
+
 
 
 const useMousePosition = () => {
@@ -36,7 +42,7 @@ const useMousePosition = () => {
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    title: "Cattitude | Build in Lovable. 10x Faster.",
+    title: "Cattitude | Build in Lovable 10x Faster",
     meta: [
       { name: "description", content: "Supercharge your Lovable.dev workflow with Cattitude." },
     ],
@@ -57,11 +63,12 @@ function _resolveAsset(valid: boolean): string {
   // Base64-encoded Drive URL, decoded only after a valid server-confirmed key.
   // Changing DRIVE_LINK: encode your new URL with btoa() and replace the string below.
   const _p = [
-    "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xZ3hMZTRORnJVbDdHdw==",
-    "S204QWlfVnUtODg2aDNfVDNqei92aWV3P3VzcD1kcml2ZV9saW5r",
+    "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8x",
+    "QTA1V1RWLVVERzFGci1XOU5ERDNOd1lsTWh2RW1FOQ==",
+    "L3ZpZXc/dXNwPXNoYXJpbmc=",
   ];
   try {
-    return atob(_p[0]!) + atob(_p[1]!);
+    return atob(_p[0]!) + atob(_p[1]!) + atob(_p[2]!);
   } catch {
     return "";
   }
@@ -148,13 +155,20 @@ function DownloadSection() {
   }
 
   return (
-    <motion.div
-      initial={{ scale: 0.95, opacity: 0 }}
-      whileInView={{ scale: 1, opacity: 1 }}
-      viewport={{ once: true }}
-      whileHover={{ borderColor: "rgba(255, 60, 172, 0.4)" }}
-      className="mx-auto max-w-lg rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm text-center transition-colors"
+    <ElectricBorder
+      color="#7df9ff"
+      speed={0.8}
+      chaos={0.05}
+      borderRadius={11}
+      className="mx-auto max-w-lg"
     >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        viewport={{ once: true }}
+        whileHover={{ borderColor: "rgba(255, 60, 172, 0.4)" }}
+        className="rounded-[11px] border border-white/10 bg-white/5 p-8 backdrop-blur-sm text-center transition-colors"
+      >
       <h2 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
         <motion.span whileInView={{ rotate: 360 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
           <Settings size={28} />
@@ -258,7 +272,8 @@ function DownloadSection() {
         </motion.span>{" "}
         Verified via secure license server · SSL encrypted
       </p>
-    </motion.div>
+      </motion.div>
+    </ElectricBorder>
   );
 }
 
@@ -288,7 +303,7 @@ function Index() {
         <CustomCursor />
 
         {/* Molten Metal Background */}
-        <div className="fixed inset-0 z-0 opacity-60 pointer-events-none">
+        <div className="fixed inset-0 z-0 opacity-60 pointer-events-none md:block hidden">
           <MoltenMetal
             color1="#0D0B1A"
             color2="#7B2FBE"
@@ -302,8 +317,15 @@ function Index() {
           />
         </div>
 
-        {/* Top Blur */}
-        <GradualBlur position="top" height="8rem" strength={3} zIndex={40} />
+        {/* Top Blur - Optimized for mobile */}
+        <GradualBlur 
+          position="top" 
+          height="8rem" 
+          strength={3} 
+          zIndex={40} 
+          responsive={true}
+          mobileHeight="4rem"
+        />
         
         {/* Progress Bar */}
         <motion.div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#7B2FBE] to-[#FF3CAC] z-[100] origin-left" style={{ scaleX }} />
@@ -318,21 +340,20 @@ function Index() {
           className="sticky top-0 z-50 border-b backdrop-blur-md transition-colors duration-300"
         >
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
-            <Magnet padding={50} magnetStrength={30}>
-              <div className="flex items-center gap-2 text-xl font-bold cursor-pointer font-display group">
-                <div className="relative">
+            <Magnet padding={50} magnetStrength={30} className="flex items-center">
+              <div className="flex items-center gap-2.5 text-xl font-bold cursor-pointer font-display group leading-none h-16">
+                <div className="relative flex items-center justify-center">
                   <img 
-                    src="/cat-logo.png" 
-
+                    src={logoAsset.url} 
                     alt="Logo" 
-                    className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(0,255,136,0.5)]" 
+                    className="w-9 h-9 object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_8px_rgba(0,255,136,0.5)] rounded-full" 
                   />
                   <div className="absolute inset-0 bg-[#00FF88]/20 blur-xl rounded-full scale-0 group-hover:scale-100 transition-transform duration-500" />
                 </div>
                 <span className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">Cattitude</span>
               </div>
             </Magnet>
-            <div className="hidden space-x-6 md:flex">
+            <div className="hidden space-x-6 md:flex items-center">
               {["Features", "Plans", "FAQ", "Download"].map((item) => (
                 <button 
                   key={item} 
@@ -343,7 +364,7 @@ function Index() {
                       document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="text-sm text-gray-400 hover:text-[#00FF88] transition-colors relative group py-2"
+                  className="text-sm text-gray-400 hover:text-[#00FF88] transition-colors relative group py-2 flex items-center h-full"
                 >
                   {item}
                   <motion.div 
@@ -366,45 +387,43 @@ function Index() {
 
 
         {/* Hero */}
-        <section className="relative container mx-auto px-4 pt-20 pb-20 text-center overflow-hidden">
+        <section className="relative container mx-auto px-4 pt-12 md:pt-20 pb-20 text-center overflow-hidden">
           <motion.div 
             animate={{ x: [0, 30, -20, 0], y: [0, -20, 10, 0] }}
             transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-            className="absolute -top-40 left-1/4 -z-10 h-[500px] w-[500px] rounded-full bg-purple-900/30 blur-3xl" 
+            className="absolute -top-40 left-1/4 -z-10 h-[500px] w-[500px] rounded-full bg-purple-900/30 blur-3xl md:block hidden" 
           />
           <motion.div 
             animate={{ x: [0, -30, 20, 0], y: [0, 20, -10, 0] }}
             transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-            className="absolute top-40 right-1/4 -z-10 h-[300px] w-[300px] rounded-full bg-blue-900/20 blur-3xl" 
+            className="absolute top-40 right-1/4 -z-10 h-[300px] w-[300px] rounded-full bg-blue-900/20 blur-3xl md:block hidden" 
           />
           
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <motion.div 
-              animate={{ scale: [1, 1.03, 1] }}
-              transition={{ repeat: Infinity, duration: 3 }}
-              className="mx-auto mb-8 inline-block"
-            >
-              <StarBorder color="#7B2FBE" speed="4s" thickness={2}>
-                <div className="px-6 py-2 text-sm text-purple-200">
-                  ✦ NEW VERSION IS LIVE · STARTING AT $1 · NO SUBSCRIPTION
-                </div>
-              </StarBorder>
-            </motion.div>
-            <h1 className="mb-6 text-5xl font-black leading-tight md:text-[80px]">
-              <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}>Build in Lovable.</motion.div>
+          <div className="relative z-10">
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               <motion.div 
-                initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
-                className="relative inline-block overflow-hidden"
+                animate={{ scale: [1, 1.03, 1] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+                className="mx-auto mb-8 inline-block"
               >
-                <span className="bg-gradient-to-r from-[#FF3CAC] via-[#7B2FBE] to-[#00FF88] bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient-flow">
-                  10x Faster.
-                </span>
+                <StarBorder color="#7B2FBE" speed="4s" thickness={2}>
+                  <div className="px-6 py-2 text-sm text-purple-200">
+                    ✦ NEW VERSION IS LIVE · STARTING AT $1 · NO SUBSCRIPTION
+                  </div>
+                </StarBorder>
               </motion.div>
-              <br />
-              <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-3xl text-gray-300 md:text-5xl">Without wasting a single credit.</motion.div>
+            <h1 className="mb-6 text-5xl font-black leading-tight md:text-[80px]">
+              <span className="flex flex-col items-center">
+                <span className="text-white">Build in Lovable</span>
+                <span className="bg-gradient-to-r from-[#00FF88] to-[#7B2FBE] bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(0,255,136,0.3)]">10x Faster</span>
+              </span>
             </h1>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mx-auto mb-10 max-w-2xl text-lg text-gray-400">
 
+
+              <br />
+              <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }} className="text-2xl text-gray-300 md:text-5xl px-2">Without wasting a single credit.</motion.div>
+            </motion.div>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mx-auto mb-10 max-w-2xl text-base md:text-lg text-gray-400 px-4">
               Cattitude supercharges your Lovable.dev workflow. Auto-approve every prompt, optimize with AI, remove watermarks, and download your full project — starting at just $1.
             </motion.p>
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 1.0 }} className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -417,7 +436,7 @@ function Index() {
                 animate={{ boxShadow: ["0 0 10px rgba(0, 255, 136, 0.3)", "0 0 25px rgba(0, 255, 136, 0.5)", "0 0 10px rgba(0, 255, 136, 0.3)"] }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                <img src="/cat-logo.png" className="w-6 h-6 inline-block mr-2 object-contain" alt="" /> Get Cattitude Now
+                <img src={logoAsset.url} className="w-6 h-6 inline-block mr-2 object-contain" alt="" /> Get Cattitude Now
               </motion.button>
               <motion.button 
                 whileHover={{ scale: 1.05 }}
@@ -431,7 +450,7 @@ function Index() {
                 💬 Contact on Telegram
               </motion.button>
             </motion.div>
-          </motion.div>
+          </div>
         </section>
 
         {/* Trust badges */}
@@ -456,8 +475,8 @@ function Index() {
         <div className="h-px w-full bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
 
         {/* Extension UI Showcase Section */}
-        <section className="container mx-auto px-4 py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section id="features" className="container mx-auto px-4 py-16 md:py-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
             {/* Left Column: Text Content */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -468,9 +487,8 @@ function Index() {
               <div className="inline-block px-4 py-1.5 rounded-full bg-[#00FF88]/10 border border-[#00FF88]/20 text-[#00FF88] text-xs font-bold mb-6 tracking-widest uppercase">
                 Premium Extension Interface
               </div>
-              <h2 className="text-4xl md:text-6xl font-bold mb-8 font-display leading-tight">
-                Powerful Modules. <br />
-                <span className="text-[#7B2FBE]">Intuitive Design.</span>
+              <h2 className="text-4xl font-bold mb-8 font-display">
+                Powerful Modules. Intuitive Design.
               </h2>
               <p className="text-gray-400 text-lg mb-10 max-w-xl font-sans leading-relaxed">
                 Experience a revolutionary workflow with our high-end Chrome extension. Every module is crafted for performance, giving you total control over your Lovable projects directly from a sleek, neon-infused sidebar.
@@ -497,7 +515,7 @@ function Index() {
             </motion.div>
 
             {/* Right Column: Visual Mockup */}
-            <div className="relative flex justify-center items-center">
+            <div className="relative flex justify-center items-center scale-90 sm:scale-100 pr-4 sm:pr-0">
               {/* Decorative Glows */}
               <div className="absolute -z-10 w-[120%] h-[120%] bg-gradient-to-tr from-[#7B2FBE]/20 via-transparent to-[#00FF88]/20 blur-[100px]" />
               
@@ -629,7 +647,7 @@ function Index() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="absolute left-[88%] lg:left-[85%] top-16 z-10 w-12 rounded-[28px] border border-white/10 bg-[#0D0B1A]/95 backdrop-blur-3xl p-2.5 flex flex-col gap-5 shadow-2xl shadow-black/50"
+                className="absolute left-[88%] sm:left-[92%] lg:left-[85%] top-16 z-10 w-10 sm:w-12 rounded-[28px] border border-white/10 bg-[#0D0B1A]/95 backdrop-blur-3xl p-2 sm:p-2.5 flex flex-col gap-4 sm:gap-5 shadow-2xl shadow-black/50"
               >
                 <div className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-white transition-colors cursor-pointer">
                    <Check size={18} className="rotate-180" />
@@ -657,7 +675,7 @@ function Index() {
                 
                 <div className="mt-8 flex justify-center">
                   <div className="w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(239,68,68,0.4)] relative">
-                    <img src="/cat-logo.png" className="w-5 h-5 object-contain" alt="" />
+                    <img src={logoAsset.url} className="w-5 h-5 object-contain" alt="" />
 
                     <div className="absolute inset-0 bg-red-500 blur-md opacity-50 rounded-full animate-pulse" />
                   </div>
@@ -890,7 +908,7 @@ function Index() {
         <footer className="border-t border-white/10 py-12 px-4">
           <div className="container mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2 font-bold text-gray-400 font-display group">
-              <img src="/cat-logo.png" className="w-6 h-6 grayscale group-hover:grayscale-0 transition-all opacity-50 group-hover:opacity-100" alt="" /> Cattitude <span className="text-xs font-normal">© 2026. All rights reserved.</span>
+              <img src={logoAsset.url} className="w-6 h-6 grayscale group-hover:grayscale-0 transition-all opacity-50 group-hover:opacity-100" alt="" /> Cattitude <span className="text-xs font-normal">© 2026. All rights reserved.</span>
             </div>
             <div className="flex gap-6">
               <a href="#" className="text-gray-400 hover:text-white"><Send size={20} /></a>

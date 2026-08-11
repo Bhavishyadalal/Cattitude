@@ -140,7 +140,27 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    cursor: none;
   }
+
+  @media (hover: hover) and (pointer: fine) {
+    body {
+      cursor: none;
+    }
+    a, button, [role="button"], input, select, textarea, .cursor-pointer {
+      cursor: none !important;
+    }
+  }
+
+  @media (hover: none) or (pointer: coarse) {
+    body {
+      cursor: auto;
+    }
+    a, button, [role="button"], input, select, textarea, .cursor-pointer {
+      cursor: auto !important;
+    }
+  }
+
 
   @keyframes gradient-flow {
     0% { background-position: 0% 50%; }
