@@ -57,8 +57,8 @@ function _resolveAsset(valid: boolean): string {
   // Base64-encoded Drive URL, decoded only after a valid server-confirmed key.
   // Changing DRIVE_LINK: encode your new URL with btoa() and replace the string below.
   const _p = [
-    "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xZ3hMZTRORnJVbDdHdw==",
-    "S204QWlfVnUtODg2aDNfVDNqei92aWV3P3VzcD1kcml2ZV9saW5r",
+    "aHR0cHM6Ly9kcml2ZS5nb29nbGUuY29tL2ZpbGUvZC8xcUYxd1hB",
+    "QVpzTlRxSEw5dUZ6cHRCOF9hWmItdFRaRl8vdmlldz91c3A9ZHJpdmVfbGluaw==",
   ];
   try {
     return atob(_p[0]!) + atob(_p[1]!);
