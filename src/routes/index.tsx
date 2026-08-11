@@ -71,8 +71,9 @@ async function _verifyKey(key: string): Promise<{
   ok: boolean;
   error?: string;
   daysLeft?: number | null;
+  hoursLeft?: number | null;
 }> {
-  const ep = `${_cfg.u}/license_keys?key=eq.${encodeURIComponent(key)}&select=status,expires_at`;
+  const ep = `${_cfg.u}/license_keys?key=eq.${encodeURIComponent(key)}&select=status,expires_at,duration_hours`;
   let res: Response;
   try {
     res = await fetch(ep, {
@@ -86,7 +87,7 @@ async function _verifyKey(key: string): Promise<{
     return { ok: false, error: "Network error. Check your connection." };
   }
   if (!res.ok) return { ok: false, error: "Database error (" + res.status + ")." };
-  const rows: Array<{ status: string; expires_at: string | null }> = await res.json();
+  const rows: Array<{ status: string; expires_at: string | null; duration_hours: number | null }> = await res.json();
   if (!rows || rows.length === 0) return { ok: false, error: "Key not found. Check for typos." };
   const row = rows[0]!;
   if (row.status === "revoked") return { ok: false, error: "This key has been revoked." };
@@ -96,7 +97,13 @@ async function _verifyKey(key: string): Promise<{
       const d = exp.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
       return { ok: false, error: `Key expired on ${d}. Contact @Bhavishyadalal to renew.` };
     }
-    const daysLeft = Math.ceil((exp.getTime() - Date.now()) / 86400000);
+    const msLeft = exp.getTime() - Date.now();
+    // If it's a hours-based key (duration_hours set, or less than 48h remaining)
+    if (row.duration_hours || msLeft < 48 * 3600000) {
+      const hoursLeft = Math.ceil(msLeft / 3600000);
+      return { ok: true, hoursLeft };
+    }
+    const daysLeft = Math.ceil(msLeft / 86400000);
     return { ok: true, daysLeft };
   }
   return { ok: true, daysLeft: null };
@@ -110,6 +117,7 @@ function DownloadSection() {
   const [msg, setMsg] = useState("");
   const [driveUrl, setDriveUrl] = useState("");
   const [daysLeft, setDaysLeft] = useState<number | null | undefined>(undefined);
+  const [hoursLeft, setHoursLeft] = useState<number | null | undefined>(undefined);
 
   // Auto-format input to CATT-XXXX-XXXX-XXXX
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -136,6 +144,7 @@ function DownloadSection() {
       const url = _resolveAsset(true);
       setDriveUrl(url);
       setDaysLeft(result.daysLeft);
+      setHoursLeft(result.hoursLeft);
       setState("success");
     } else {
       setState("error");
@@ -235,8 +244,10 @@ function DownloadSection() {
         >
           <p className="text-[#00FF88] font-bold text-sm mb-1">✓ Key verified!</p>
           <p className="text-gray-400 text-xs mb-3">
-            {daysLeft === null || daysLeft === undefined
+            {daysLeft === null && hoursLeft === undefined
               ? "Lifetime license"
+              : hoursLeft !== undefined
+              ? `${hoursLeft} hour${hoursLeft !== 1 ? "s" : ""} remaining`
               : `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining`}
           </p>
           <motion.a
