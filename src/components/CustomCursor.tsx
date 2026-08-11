@@ -13,10 +13,6 @@ export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Disable custom cursor on mobile devices
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) return;
-
     const handleMouseMove = (e: MouseEvent) => {
       if (!isVisible) setIsVisible(true);
       mouseX.set(e.clientX);
